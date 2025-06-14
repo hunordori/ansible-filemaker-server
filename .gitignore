@@ -1,4 +1,6 @@
 ansible.cfg
 inventory
 vars/*
+!vars/.gitkeep
 files/*
+!files/.gitkeep

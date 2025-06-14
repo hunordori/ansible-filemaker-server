@@ -1,0 +1,8 @@
+assisted_install:
+  Admin_Console_User: "serveradmin"
+  Admin_Console_Password: "serveradminpassword"
+  Admin_Console_PIN: "1234"
+  Swap_File_Size: "2G" #1G, 2G, 4G
+src_file: "fms_21.1.5.500_Ubuntu22_amd64.zip"
+deb_package: "filemaker-server-21.1.5.500-amd64.deb"
+fm_cert: "LicenseCert.fmcert"

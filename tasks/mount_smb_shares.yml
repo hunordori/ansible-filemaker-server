@@ -1,0 +1,30 @@
+# tasks/mount_smb_shares.yml
+
+- name: Create /etc/smbcredentials with SMB username and password
+  copy:
+      dest: /etc/smbcredentials
+      content: |
+          username={{ smb_credentials.username }}
+          password={{ smb_credentials.password }}
+      owner: root
+      group: root
+      mode: "0600"
+
+- name: Ensure mount points exist
+  file:
+      path: "{{ item.mount_point }}"
+      state: directory
+      owner: fmserver
+      group: fmsadmin
+      mode: "0775"
+  loop: "{{ smb_mounts }}"
+
+- name: Ensure SMB shares are mounted and in /etc/fstab
+  mount:
+      src: "{{ item.remote }}"
+      path: "{{ item.mount_point }}"
+      fstype: cifs
+      opts: "credentials=/etc/smbcredentials,iocharset=utf8,vers=3.0,uid=fmserver,gid=fmsadmin,file_mode=0775,dir_mode=0775"
+      state: mounted
+  loop: "{{ smb_mounts }}"
+  register: mount_results

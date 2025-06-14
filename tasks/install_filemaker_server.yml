@@ -1,0 +1,90 @@
+# tasks/install_filemaker_server.yml
+
+- set_fact:
+      assisted_install: >-
+          {{
+            assisted_install_defaults
+            | combine(assisted_install_overrides | default({}), recursive=True)
+          }}
+
+- name: Ensure necessary packages are installed
+  ansible.builtin.apt:
+      name:
+          - unzip
+          - wget
+          - git
+          - curl
+          - btop
+          - cifs-utils
+
+      state: present
+      update_cache: yes
+
+- name: Ensure destination directory exists
+  file:
+      path: "{{ dest_dir }}"
+      state: directory
+      mode: "0755"
+
+- name: Copy FileMaker Server zip file to remote server
+  copy:
+      src: "files/{{ src_file }}"
+      dest: "{{ dest_dir }}/{{ src_file }}"
+      mode: "0644"
+
+- name: Unzip the FileMaker Server installation file
+  unarchive:
+      src: "{{ dest_dir }}/{{ src_file }}"
+      dest: "{{ dest_dir }}"
+      remote_src: yes
+
+- name: Ensure the .deb file is executable
+  file:
+      path: "{{ dest_dir }}/{{ deb_package }}"
+      mode: "0755"
+      state: file
+  register: executable_status
+
+- name: Copy Assisted Install.txt to remote server
+  template:
+      src: "templates/Assisted_Install.txt.j2"
+      dest: "{{ dest_dir }}/Assisted Install.txt"
+      mode: "0755"
+      force: yes
+
+- name: Copy Filemaker License to remote server
+  copy:
+      src: "{{ fm_cert }}"
+      dest: "{{ dest_dir }}/LicenseCert.fmcert"
+      mode: "0755"
+      force: yes
+
+- name: Install the .deb package with Assisted Install
+  apt:
+      deb: "{{ dest_dir }}/{{ deb_package }}"
+      state: present
+  environment:
+      FM_ASSISTED_INSTALL: "{{ dest_dir }}/Assisted Install.txt"
+  register: install_output
+
+- name: Debug installation output
+  debug:
+      var: install_output.stdout
+
+- name: Verify FileMaker Server installation
+  command: systemctl status fmshelper
+  register: fms_status
+  ignore_errors: true
+
+- name: Ensure FileMaker Server is installed and running
+  assert:
+      that:
+          - "fms_status.rc == 0"
+      fail_msg: "FileMaker Server installation failed or the service is not running."
+      success_msg: "FileMaker Server installed successfully and the service is running."
+
+- name: Add user to fmsadmin group
+  user:
+      name: "{{ ansible_user }}"
+      groups: fmsadmin
+      append: yes

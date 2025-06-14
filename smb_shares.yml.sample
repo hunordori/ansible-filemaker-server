@@ -1,0 +1,9 @@
+smb_credentials:
+    username: "yourSMBusername"
+    password: "yourSMBuserpassword"
+
+smb_mounts:
+    - remote: "//[FQDN/path/to/folder"
+      mount_point: "/mnt/folder"
+    - remote: "//[FQDN/path/to/other/folder"
+      mount_point: "/mnt/otherfolder"

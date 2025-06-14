@@ -1,0 +1,15 @@
+---
+- name: Install FileMaker Server on Linux
+  hosts: all
+  become: yes
+  vars_files:
+      - defaults/main.yml
+      - vars/fms_vars.yml
+      - vars/smb_shares.yml
+
+  tasks:
+      - name: Install FileMaker Server on Linux
+        ansible.builtin.include_tasks: tasks/install_filemaker_server.yml
+
+      - name: Mount SMB Shares
+        ansible.builtin.include_tasks: tasks/mount_smb_shares.yml

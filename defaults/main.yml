@@ -1,0 +1,13 @@
+assisted_install_defaults:
+    License_Accepted: 1
+    Deployment_Options: 0
+    Admin_Console_User: "serveradmin"
+    Admin_Console_Password: "changeMeToSomethingSecure"
+    Admin_Console_PIN: "1111"
+    License_Certificate_Path: "{{ dest_dir }}/LicenseCert.fmcert"
+    Filter_Databases: 1
+    Remove_Desktop_Shortcut: 0
+    Remove_Sample_Database: 1
+    Use_HTTPS_Tunneling: 0
+    Swap_File_Size: "1G"
+    Swappiness: 10
